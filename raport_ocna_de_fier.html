@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title id="head-title">raport_ocna_de_fier.html</title>
+      <style type="text/css">body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  /* do not increase min-width as some may use split screens */
+  min-width: 800px;
+  color: #999;
+}
+
+h1 {
+  font-size: 24px;
+  color: black;
+}
+
+h2 {
+  font-size: 16px;
+  color: black;
+}
+
+p {
+  color: black;
+}
+
+a {
+  color: #999;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+/******************************
+ * SUMMARY INFORMATION
+ ******************************/
+#environment td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  vertical-align: top;
+}
+#environment tr:nth-child(odd) {
+  background-color: #f6f6f6;
+}
+#environment ul {
+  margin: 0;
+  padding: 0 20px;
+}
+
+/******************************
+ * TEST RESULT COLORS
+ ******************************/
+span.passed,
+.passed .col-result {
+  color: green;
+}
+
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+  color: orange;
+}
+
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+  color: red;
+}
+
+.col-links__extra {
+  margin-right: 3px;
+}
+
+/******************************
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ ******************************/
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+#results-table {
+  border: 1px solid #e6e6e6;
+  color: #999;
+  font-size: 12px;
+  width: 100%;
+}
+#results-table th,
+#results-table td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  text-align: left;
+}
+#results-table th {
+  font-weight: bold;
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+.logwrapper {
+  max-height: 230px;
+  overflow-y: scroll;
+  background-color: #e6e6e6;
+}
+.logwrapper.expanded {
+  max-height: none;
+}
+.logwrapper.expanded .logexpander:after {
+  content: "collapse [-]";
+}
+.logwrapper .logexpander {
+  z-index: 1;
+  position: sticky;
+  top: 10px;
+  width: max-content;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 5px 7px;
+  margin: 10px 0 10px calc(100% - 80px);
+  cursor: pointer;
+  background-color: #e6e6e6;
+}
+.logwrapper .logexpander:after {
+  content: "expand [+]";
+}
+.logwrapper .logexpander:hover {
+  color: #000;
+  border-color: #000;
+}
+.logwrapper .log {
+  min-height: 40px;
+  position: relative;
+  top: -50px;
+  height: calc(100% + 50px);
+  border: 1px solid #e6e6e6;
+  color: black;
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  padding: 5px;
+  padding-right: 80px;
+  white-space: pre-wrap;
+}
+
+div.media {
+  border: 1px solid #e6e6e6;
+  float: right;
+  height: 240px;
+  margin: 0 5px;
+  overflow: hidden;
+  width: 320px;
+}
+
+.media-container {
+  display: grid;
+  grid-template-columns: 25px auto 25px;
+  align-items: center;
+  flex: 1 1;
+  overflow: hidden;
+  height: 200px;
+}
+
+.media-container--fullscreen {
+  grid-template-columns: 0px auto 0px;
+}
+
+.media-container__nav--right,
+.media-container__nav--left {
+  text-align: center;
+  cursor: pointer;
+}
+
+.media-container__viewport {
+  cursor: pointer;
+  text-align: center;
+  height: inherit;
+}
+.media-container__viewport img,
+.media-container__viewport video {
+  object-fit: cover;
+  width: 100%;
+  max-height: 100%;
+}
+
+.media__name,
+.media__counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex: 0 0 25px;
+  align-items: center;
+}
+
+.collapsible td:not(.col-links) {
+  cursor: pointer;
+}
+.collapsible td:not(.col-links):hover::after {
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.col-result {
+  width: 130px;
+}
+.col-result:hover::after {
+  content: " (hide details)";
+}
+
+.col-result.collapsed:hover::after {
+  content: " (show details)";
+}
+
+#environment-header h2:hover::after {
+  content: " (hide details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#environment-header.collapsed h2:hover::after {
+  content: " (show details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+.sortable {
+  cursor: pointer;
+}
+.sortable.desc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: -12.5px;
+  border: 10px solid #4caf50;
+  border-bottom: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.sortable.asc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: 12.5px;
+  border: 10px solid #4caf50;
+  border-top: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+
+.hidden, .summary__reload__button.hidden {
+  display: none;
+}
+
+.summary__data {
+  flex: 0 0 550px;
+}
+.summary__reload {
+  flex: 1 1;
+  display: flex;
+  justify-content: center;
+}
+.summary__reload__button {
+  flex: 0 0 300px;
+  display: flex;
+  color: white;
+  font-weight: bold;
+  background-color: #4caf50;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.summary__reload__button:hover {
+  background-color: #46a049;
+}
+.summary__spacer {
+  flex: 0 0 550px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.filters,
+.collapse {
+  display: flex;
+  align-items: center;
+}
+.filters button,
+.collapse button {
+  color: #999;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.filters button:hover,
+.collapse button:hover {
+  color: #ccc;
+}
+
+.filter__label {
+  margin-right: 10px;
+}
+
+      </style>
+    
+  </head>
+  <body>
+    <h1 id="title">raport_ocna_de_fier.html</h1>
+    <p>Report generated on 16-Jun-2026 at 09:25:28 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
+        v4.2.0</p>
+    <div id="environment-header">
+      <h2>Environment</h2>
+    </div>
+    <table id="environment"></table>
+    <!-- TEMPLATES -->
+      <template id="template_environment_row">
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </template>
+    <template id="template_results-table__body--empty">
+      <tbody class="results-table-row">
+        <tr id="not-found-message">
+          <td colspan="4">No results found. Check the filters.</td>
+        </tr>
+      </tbody>
+    </template>
+    <template id="template_results-table__tbody">
+      <tbody class="results-table-row">
+        <tr class="collapsible">
+        </tr>
+        <tr class="extras-row">
+          <td class="extra" colspan="4">
+            <div class="extraHTML"></div>
+            <div class="media">
+              <div class="media-container">
+                  <div class="media-container__nav--left">&lt;</div>
+                  <div class="media-container__viewport">
+                    <img src="" />
+                    <video controls>
+                      <source src="" type="video/mp4">
+                    </video>
+                  </div>
+                  <div class="media-container__nav--right">&gt;</div>
+                </div>
+                <div class="media__name"></div>
+                <div class="media__counter"></div>
+            </div>
+            <div class="logwrapper">
+              <div class="logexpander"></div>
+              <div class="log"></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </template>
+    <!-- END TEMPLATES -->
+    <div class="summary">
+      <div class="summary__data">
+        <h2>Summary</h2>
+        <div class="additional-summary prefix">
+        </div>
+        <p class="run-count">80 tests took 00:00:58.</p>
+        <p class="filter">(Un)check the boxes to filter the results.</p>
+        <div class="summary__reload">
+          <div class="summary__reload__button hidden" onclick="location.reload()">
+            <div>There are still tests running. <br />Reload this page to get the latest results!</div>
+          </div>
+        </div>
+        <div class="summary__spacer"></div>
+        <div class="controls">
+          <div class="filters">
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="failed" >
+            <span class="failed">17 Failed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="passed" >
+            <span class="passed">63 Passed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="skipped" disabled>
+            <span class="skipped">0 Skipped,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xfailed" disabled>
+            <span class="xfailed">0 Expected failures,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xpassed" disabled>
+            <span class="xpassed">0 Unexpected passes,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="error" disabled>
+            <span class="error">0 Errors,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="rerun" disabled>
+            <span class="rerun">0 Reruns</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="retried" disabled>
+            <span class="retried">0 Retried,</span>
+          </div>
+          <div class="collapse">
+            <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
+          </div>
+        </div>
+      </div>
+      <div class="additional-summary summary">
+      </div>
+      <div class="additional-summary postfix">
+      </div>
+    </div>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable" data-column-type="result">Result</th>
+          <th class="sortable" data-column-type="testId">Test</th>
+          <th class="sortable" data-column-type="duration">Duration</th>
+          <th>Links</th>
+        </tr>
+      </thead>
+    </table>
+  <footer>
+    <div id="data-container" data-jsonblob="{&#34;environment&#34;: {&#34;Python&#34;: &#34;3.13.14&#34;, &#34;Platform&#34;: &#34;Windows-11-10.0.26100-SP0&#34;, &#34;Packages&#34;: {&#34;pytest&#34;: &#34;9.1.0&#34;, &#34;pluggy&#34;: &#34;1.6.0&#34;}, &#34;Plugins&#34;: {&#34;html&#34;: &#34;4.2.0&#34;, &#34;metadata&#34;: &#34;3.1.1&#34;}}, &#34;tests&#34;: {&#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Acasa-/]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Acasa-/]&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Acasa-/]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Istoric-/istoric]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Istoric-/istoric]&#34;, &#34;duration&#34;: &#34;176 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Istoric-/istoric]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;176 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Cultura-/cultura]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Cultura-/cultura]&#34;, &#34;duration&#34;: &#34;172 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Cultura-/cultura]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;172 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Geografie-/geografie]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Geografie-/geografie]&#34;, &#34;duration&#34;: &#34;121 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Geografie-/geografie]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;121 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;, name = &amp;#x27;Geografie&amp;#x27;, path = &amp;#x27;/geografie&amp;#x27;\n\n    @pytest.mark.parametrize(&amp;quot;name,path&amp;quot;, MAIN_PAGES)\n    def test_paginile_principale_raspund_cu_succes(session: requests.Session, name: str, path: str) -&amp;gt; None:\n        response = get_page(session, path)\n&amp;gt;       assert_response_ok(response, make_url(path))\n\ntest_ocna_de_fier.py:160: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nresponse = &amp;lt;Response [404]&amp;gt;, url = &amp;#x27;https://www.ocnadefier.ro/geografie&amp;#x27;\n\n    def assert_response_ok(response: requests.Response, url: str) -&amp;gt; None:\n&amp;gt;       assert response.status_code &amp;lt; 400, f&amp;quot;URL invalid: {url} -&amp;gt; status {response.status_code}&amp;quot;\nE       AssertionError: URL invalid: https://www.ocnadefier.ro/geografie -&amp;gt; status 404\nE       assert 404 &amp;lt; 400\nE        +  where 404 = &amp;lt;Response [404]&amp;gt;.status_code\n\ntest_ocna_de_fier.py:154: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Obiective turistice-/obiective-turistice]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Obiective turistice-/obiective-turistice]&#34;, &#34;duration&#34;: &#34;106 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Obiective turistice-/obiective-turistice]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;106 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;, name = &amp;#x27;Obiective turistice&amp;#x27;, path = &amp;#x27;/obiective-turistice&amp;#x27;\n\n    @pytest.mark.parametrize(&amp;quot;name,path&amp;quot;, MAIN_PAGES)\n    def test_paginile_principale_raspund_cu_succes(session: requests.Session, name: str, path: str) -&amp;gt; None:\n        response = get_page(session, path)\n&amp;gt;       assert_response_ok(response, make_url(path))\n\ntest_ocna_de_fier.py:160: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nresponse = &amp;lt;Response [404]&amp;gt;, url = &amp;#x27;https://www.ocnadefier.ro/obiective-turistice&amp;#x27;\n\n    def assert_response_ok(response: requests.Response, url: str) -&amp;gt; None:\n&amp;gt;       assert response.status_code &amp;lt; 400, f&amp;quot;URL invalid: {url} -&amp;gt; status {response.status_code}&amp;quot;\nE       AssertionError: URL invalid: https://www.ocnadefier.ro/obiective-turistice -&amp;gt; status 404\nE       assert 404 &amp;lt; 400\nE        +  where 404 = &amp;lt;Response [404]&amp;gt;.status_code\n\ntest_ocna_de_fier.py:154: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Lacase de cult-/lacase-de-cult]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Lacase de cult-/lacase-de-cult]&#34;, &#34;duration&#34;: &#34;178 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Lacase de cult-/lacase-de-cult]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;178 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Obiceiuri si traditii-/obiceiuri-si-traditii]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Obiceiuri si traditii-/obiceiuri-si-traditii]&#34;, &#34;duration&#34;: &#34;179 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Obiceiuri si traditii-/obiceiuri-si-traditii]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;179 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&#34;, &#34;duration&#34;: &#34;177 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;177 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Evenimente locale-/evenimente-locale]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Evenimente locale-/evenimente-locale]&#34;, &#34;duration&#34;: &#34;175 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Evenimente locale-/evenimente-locale]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;175 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Foto-/foto]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Foto-/foto]&#34;, &#34;duration&#34;: &#34;100 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Foto-/foto]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;100 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;, name = &amp;#x27;Foto&amp;#x27;, path = &amp;#x27;/foto&amp;#x27;\n\n    @pytest.mark.parametrize(&amp;quot;name,path&amp;quot;, MAIN_PAGES)\n    def test_paginile_principale_raspund_cu_succes(session: requests.Session, name: str, path: str) -&amp;gt; None:\n        response = get_page(session, path)\n&amp;gt;       assert_response_ok(response, make_url(path))\n\ntest_ocna_de_fier.py:160: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nresponse = &amp;lt;Response [404]&amp;gt;, url = &amp;#x27;https://www.ocnadefier.ro/foto&amp;#x27;\n\n    def assert_response_ok(response: requests.Response, url: str) -&amp;gt; None:\n&amp;gt;       assert response.status_code &amp;lt; 400, f&amp;quot;URL invalid: {url} -&amp;gt; status {response.status_code}&amp;quot;\nE       AssertionError: URL invalid: https://www.ocnadefier.ro/foto -&amp;gt; status 404\nE       assert 404 &amp;lt; 400\nE        +  where 404 = &amp;lt;Response [404]&amp;gt;.status_code\n\ntest_ocna_de_fier.py:154: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Administratie locala-/administratie-locala]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Administratie locala-/administratie-locala]&#34;, &#34;duration&#34;: &#34;100 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Administratie locala-/administratie-locala]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;100 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;, name = &amp;#x27;Administratie locala&amp;#x27;, path = &amp;#x27;/administratie-locala&amp;#x27;\n\n    @pytest.mark.parametrize(&amp;quot;name,path&amp;quot;, MAIN_PAGES)\n    def test_paginile_principale_raspund_cu_succes(session: requests.Session, name: str, path: str) -&amp;gt; None:\n        response = get_page(session, path)\n&amp;gt;       assert_response_ok(response, make_url(path))\n\ntest_ocna_de_fier.py:160: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nresponse = &amp;lt;Response [404]&amp;gt;, url = &amp;#x27;https://www.ocnadefier.ro/administratie-locala&amp;#x27;\n\n    def assert_response_ok(response: requests.Response, url: str) -&amp;gt; None:\n&amp;gt;       assert response.status_code &amp;lt; 400, f&amp;quot;URL invalid: {url} -&amp;gt; status {response.status_code}&amp;quot;\nE       AssertionError: URL invalid: https://www.ocnadefier.ro/administratie-locala -&amp;gt; status 404\nE       assert 404 &amp;lt; 400\nE        +  where 404 = &amp;lt;Response [404]&amp;gt;.status_code\n\ntest_ocna_de_fier.py:154: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Contact-/contact]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Contact-/contact]&#34;, &#34;duration&#34;: &#34;177 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Contact-/contact]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;177 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Monitorul Oficial Local-/monitorul-oficial-local]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Monitorul Oficial Local-/monitorul-oficial-local]&#34;, &#34;duration&#34;: &#34;175 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_raspund_cu_succes[Monitorul Oficial Local-/monitorul-oficial-local]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;175 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Acasa-/]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Acasa-/]&#34;, &#34;duration&#34;: &#34;118 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Acasa-/]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;118 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Istoric-/istoric]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Istoric-/istoric]&#34;, &#34;duration&#34;: &#34;174 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Istoric-/istoric]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;174 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Cultura-/cultura]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Cultura-/cultura]&#34;, &#34;duration&#34;: &#34;172 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Cultura-/cultura]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;172 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Geografie-/geografie]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Geografie-/geografie]&#34;, &#34;duration&#34;: &#34;102 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Geografie-/geografie]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;102 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;, name = &amp;#x27;Geografie&amp;#x27;, path = &amp;#x27;/geografie&amp;#x27;\n\n    @pytest.mark.parametrize(&amp;quot;name,path&amp;quot;, MAIN_PAGES)\n    def test_paginile_principale_se_incarca_rezonabil(session: requests.Session, name: str, path: str) -&amp;gt; None:\n        start = time.perf_counter()\n        response = get_page(session, path)\n        elapsed = time.perf_counter() - start\n&amp;gt;       assert_response_ok(response, make_url(path))\n\ntest_ocna_de_fier.py:170: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nresponse = &amp;lt;Response [404]&amp;gt;, url = &amp;#x27;https://www.ocnadefier.ro/geografie&amp;#x27;\n\n    def assert_response_ok(response: requests.Response, url: str) -&amp;gt; None:\n&amp;gt;       assert response.status_code &amp;lt; 400, f&amp;quot;URL invalid: {url} -&amp;gt; status {response.status_code}&amp;quot;\nE       AssertionError: URL invalid: https://www.ocnadefier.ro/geografie -&amp;gt; status 404\nE       assert 404 &amp;lt; 400\nE        +  where 404 = &amp;lt;Response [404]&amp;gt;.status_code\n\ntest_ocna_de_fier.py:154: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Obiective turistice-/obiective-turistice]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Obiective turistice-/obiective-turistice]&#34;, &#34;duration&#34;: &#34;103 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Obiective turistice-/obiective-turistice]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;103 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;, name = &amp;#x27;Obiective turistice&amp;#x27;, path = &amp;#x27;/obiective-turistice&amp;#x27;\n\n    @pytest.mark.parametrize(&amp;quot;name,path&amp;quot;, MAIN_PAGES)\n    def test_paginile_principale_se_incarca_rezonabil(session: requests.Session, name: str, path: str) -&amp;gt; None:\n        start = time.perf_counter()\n        response = get_page(session, path)\n        elapsed = time.perf_counter() - start\n&amp;gt;       assert_response_ok(response, make_url(path))\n\ntest_ocna_de_fier.py:170: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nresponse = &amp;lt;Response [404]&amp;gt;, url = &amp;#x27;https://www.ocnadefier.ro/obiective-turistice&amp;#x27;\n\n    def assert_response_ok(response: requests.Response, url: str) -&amp;gt; None:\n&amp;gt;       assert response.status_code &amp;lt; 400, f&amp;quot;URL invalid: {url} -&amp;gt; status {response.status_code}&amp;quot;\nE       AssertionError: URL invalid: https://www.ocnadefier.ro/obiective-turistice -&amp;gt; status 404\nE       assert 404 &amp;lt; 400\nE        +  where 404 = &amp;lt;Response [404]&amp;gt;.status_code\n\ntest_ocna_de_fier.py:154: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Lacase de cult-/lacase-de-cult]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Lacase de cult-/lacase-de-cult]&#34;, &#34;duration&#34;: &#34;181 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Lacase de cult-/lacase-de-cult]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;181 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Obiceiuri si traditii-/obiceiuri-si-traditii]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Obiceiuri si traditii-/obiceiuri-si-traditii]&#34;, &#34;duration&#34;: &#34;183 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Obiceiuri si traditii-/obiceiuri-si-traditii]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;183 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&#34;, &#34;duration&#34;: &#34;179 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;179 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Evenimente locale-/evenimente-locale]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Evenimente locale-/evenimente-locale]&#34;, &#34;duration&#34;: &#34;179 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Evenimente locale-/evenimente-locale]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;179 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Foto-/foto]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Foto-/foto]&#34;, &#34;duration&#34;: &#34;101 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Foto-/foto]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;101 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;, name = &amp;#x27;Foto&amp;#x27;, path = &amp;#x27;/foto&amp;#x27;\n\n    @pytest.mark.parametrize(&amp;quot;name,path&amp;quot;, MAIN_PAGES)\n    def test_paginile_principale_se_incarca_rezonabil(session: requests.Session, name: str, path: str) -&amp;gt; None:\n        start = time.perf_counter()\n        response = get_page(session, path)\n        elapsed = time.perf_counter() - start\n&amp;gt;       assert_response_ok(response, make_url(path))\n\ntest_ocna_de_fier.py:170: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nresponse = &amp;lt;Response [404]&amp;gt;, url = &amp;#x27;https://www.ocnadefier.ro/foto&amp;#x27;\n\n    def assert_response_ok(response: requests.Response, url: str) -&amp;gt; None:\n&amp;gt;       assert response.status_code &amp;lt; 400, f&amp;quot;URL invalid: {url} -&amp;gt; status {response.status_code}&amp;quot;\nE       AssertionError: URL invalid: https://www.ocnadefier.ro/foto -&amp;gt; status 404\nE       assert 404 &amp;lt; 400\nE        +  where 404 = &amp;lt;Response [404]&amp;gt;.status_code\n\ntest_ocna_de_fier.py:154: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Administratie locala-/administratie-locala]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Administratie locala-/administratie-locala]&#34;, &#34;duration&#34;: &#34;112 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Administratie locala-/administratie-locala]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;112 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;, name = &amp;#x27;Administratie locala&amp;#x27;, path = &amp;#x27;/administratie-locala&amp;#x27;\n\n    @pytest.mark.parametrize(&amp;quot;name,path&amp;quot;, MAIN_PAGES)\n    def test_paginile_principale_se_incarca_rezonabil(session: requests.Session, name: str, path: str) -&amp;gt; None:\n        start = time.perf_counter()\n        response = get_page(session, path)\n        elapsed = time.perf_counter() - start\n&amp;gt;       assert_response_ok(response, make_url(path))\n\ntest_ocna_de_fier.py:170: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nresponse = &amp;lt;Response [404]&amp;gt;, url = &amp;#x27;https://www.ocnadefier.ro/administratie-locala&amp;#x27;\n\n    def assert_response_ok(response: requests.Response, url: str) -&amp;gt; None:\n&amp;gt;       assert response.status_code &amp;lt; 400, f&amp;quot;URL invalid: {url} -&amp;gt; status {response.status_code}&amp;quot;\nE       AssertionError: URL invalid: https://www.ocnadefier.ro/administratie-locala -&amp;gt; status 404\nE       assert 404 &amp;lt; 400\nE        +  where 404 = &amp;lt;Response [404]&amp;gt;.status_code\n\ntest_ocna_de_fier.py:154: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Contact-/contact]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Contact-/contact]&#34;, &#34;duration&#34;: &#34;183 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Contact-/contact]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;183 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Monitorul Oficial Local-/monitorul-oficial-local]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Monitorul Oficial Local-/monitorul-oficial-local]&#34;, &#34;duration&#34;: &#34;175 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_paginile_principale_se_incarca_rezonabil[Monitorul Oficial Local-/monitorul-oficial-local]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;175 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_homepage_are_identitate_vizibila&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_homepage_are_identitate_vizibila&#34;, &#34;duration&#34;: &#34;164 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_homepage_are_identitate_vizibila&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;164 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_homepage_are_meniu_principal&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_homepage_are_meniu_principal&#34;, &#34;duration&#34;: &#34;142 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_homepage_are_meniu_principal&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;142 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;\n\n    def test_homepage_are_meniu_principal(session: requests.Session) -&amp;gt; None:\n        response = get_page(session, &amp;quot;/&amp;quot;)\n        soup = parse_html(response)\n        links_text = &amp;quot; &amp;quot;.join(a.get_text(&amp;quot; &amp;quot;, strip=True) for a in soup.find_all(&amp;quot;a&amp;quot;))\n        expected_menu_items = [\n            &amp;quot;Istoric&amp;quot;,\n            &amp;quot;Cultura&amp;quot;,\n            &amp;quot;Geografie&amp;quot;,\n            &amp;quot;Obiective Turistice&amp;quot;,\n            &amp;quot;Lacase de cult&amp;quot;,\n            &amp;quot;Evenimente Locale&amp;quot;,\n            &amp;quot;Contact&amp;quot;,\n        ]\n        for item in expected_menu_items:\n&amp;gt;           assert item.lower() in links_text.lower(), f&amp;quot;Lipseste item meniu: {item}&amp;quot;\nE           AssertionError: Lipseste item meniu: Obiective Turistice\nE           assert &amp;#x27;obiective turistice&amp;#x27; in &amp;#x27;comuna ocna de fier jude\u021bul cara\u0219-severin comuna ocna de fier evenimente locale cultur\u0103 despre institu\u021bie geografie i...i\u021bii publice financiar contabil juridic registru agricol resurse umane stare civil\u0103 taxe \u0219i impozite urbanism infoghid&amp;#x27;\nE            +  where &amp;#x27;obiective turistice&amp;#x27; = &amp;lt;built-in method lower of str object at 0x000001A805296930&amp;gt;()\nE            +    where &amp;lt;built-in method lower of str object at 0x000001A805296930&amp;gt; = &amp;#x27;Obiective Turistice&amp;#x27;.lower\nE            +  and   &amp;#x27;comuna ocna de fier jude\u021bul cara\u0219-severin comuna ocna de fier evenimente locale cultur\u0103 despre institu\u021bie geografie i...i\u021bii publice financiar contabil juridic registru agricol resurse umane stare civil\u0103 taxe \u0219i impozite urbanism infoghid&amp;#x27; = &amp;lt;built-in method lower of str object at 0x000001A803192050&amp;gt;()\nE            +    where &amp;lt;built-in method lower of str object at 0x000001A803192050&amp;gt; = &amp;#x27;COMUNA OCNA DE FIER Jude\u021bul Cara\u0219-Severin Comuna Ocna de Fier Evenimente locale Cultur\u0103 Despre institu\u021bie Geografie I...i\u021bii publice Financiar contabil Juridic Registru agricol Resurse umane Stare civil\u0103 Taxe \u0219i impozite Urbanism INFOGHID&amp;#x27;.lower\n\ntest_ocna_de_fier.py:196: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_contact_are_informatii_esentiale&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_contact_are_informatii_esentiale&#34;, &#34;duration&#34;: &#34;188 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_contact_are_informatii_esentiale&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;188 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_monitorul_oficial_local_contine_categorii_documente&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_monitorul_oficial_local_contine_categorii_documente&#34;, &#34;duration&#34;: &#34;196 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_monitorul_oficial_local_contine_categorii_documente&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;196 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;\n\n    def test_monitorul_oficial_local_contine_categorii_documente(session: requests.Session) -&amp;gt; None:\n        response = get_page(session, &amp;quot;/monitorul-oficial-local&amp;quot;)\n        soup = parse_html(response)\n        text = soup.get_text(&amp;quot; &amp;quot;, strip=True).lower()\n        expected_terms = [\n            &amp;quot;monitorul oficial&amp;quot;,\n            &amp;quot;documente&amp;quot;,\n            &amp;quot;hot\u0103r\u00e2ri&amp;quot;,\n            &amp;quot;dispozi&amp;quot;,\n            &amp;quot;autoritatea&amp;quot;,\n        ]\n        missing = [term for term in expected_terms if term not in text]\n&amp;gt;       assert not missing, f&amp;quot;Lipsesc termeni in Monitorul Oficial Local: {missing}&amp;quot;\nE       AssertionError: Lipsesc termeni in Monitorul Oficial Local: [&amp;#x27;autoritatea&amp;#x27;]\nE       assert not [&amp;#x27;autoritatea&amp;#x27;]\n\ntest_ocna_de_fier.py:221: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/istoric-ISTORIC]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/istoric-ISTORIC]&#34;, &#34;duration&#34;: &#34;196 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/istoric-ISTORIC]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;196 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/cultura-CULTURA]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/cultura-CULTURA]&#34;, &#34;duration&#34;: &#34;198 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/cultura-CULTURA]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;198 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/obiective-turistice-OBIECTIVE TURISTICE]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/obiective-turistice-OBIECTIVE TURISTICE]&#34;, &#34;duration&#34;: &#34;123 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/obiective-turistice-OBIECTIVE TURISTICE]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;123 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;, path = &amp;#x27;/obiective-turistice&amp;#x27;, expected_text = &amp;#x27;OBIECTIVE TURISTICE&amp;#x27;\n\n    @pytest.mark.parametrize(\n        &amp;quot;path,expected_text&amp;quot;,\n        [\n            (&amp;quot;/istoric&amp;quot;, &amp;quot;ISTORIC&amp;quot;),\n            (&amp;quot;/cultura&amp;quot;, &amp;quot;CULTURA&amp;quot;),\n            (&amp;quot;/obiective-turistice&amp;quot;, &amp;quot;OBIECTIVE TURISTICE&amp;quot;),\n            (&amp;quot;/lacase-de-cult&amp;quot;, &amp;quot;LACASE DE CULT&amp;quot;),\n            (&amp;quot;/obiceiuri-si-traditii&amp;quot;, &amp;quot;OBICEIURI SI TRADITII&amp;quot;),\n            (&amp;quot;/evenimente-locale&amp;quot;, &amp;quot;EVENIMENTE LOCALE&amp;quot;),\n            (&amp;quot;/contact&amp;quot;, &amp;quot;Contact&amp;quot;),\n        ],\n    )\n    def test_pagini_cu_titluri_asteptate(session: requests.Session, path: str, expected_text: str) -&amp;gt; None:\n        response = get_page(session, path)\n        soup = parse_html(response)\n        text = soup.get_text(&amp;quot; &amp;quot;, strip=True)\n&amp;gt;       assert expected_text.lower() in text.lower(), f&amp;quot;Pagina {path} nu contine titlul/textul: {expected_text}&amp;quot;\nE       AssertionError: Pagina /obiective-turistice nu contine titlul/textul: OBIECTIVE TURISTICE\nE       assert &amp;#x27;obiective turistice&amp;#x27; in &amp;#x27;nu am g\u0103sit pagina \u2013 primaria  ocna de fier comuna ocna de fier jude\u021bul cara\u0219-severin comuna ocna de fier evenimente ...gricol resurse umane stare civil\u0103 taxe \u0219i impozite urbanism copyright\u00a9 2026 primaria ocna de fier web design: infoghid&amp;#x27;\nE        +  where &amp;#x27;obiective turistice&amp;#x27; = &amp;lt;built-in method lower of str object at 0x000001A805296E30&amp;gt;()\nE        +    where &amp;lt;built-in method lower of str object at 0x000001A805296E30&amp;gt; = &amp;#x27;OBIECTIVE TURISTICE&amp;#x27;.lower\nE        +  and   &amp;#x27;nu am g\u0103sit pagina \u2013 primaria  ocna de fier comuna ocna de fier jude\u021bul cara\u0219-severin comuna ocna de fier evenimente ...gricol resurse umane stare civil\u0103 taxe \u0219i impozite urbanism copyright\u00a9 2026 primaria ocna de fier web design: infoghid&amp;#x27; = &amp;lt;built-in method lower of str object at 0x000001A803092930&amp;gt;()\nE        +    where &amp;lt;built-in method lower of str object at 0x000001A803092930&amp;gt; = &amp;#x27;Nu am g\u0103sit pagina \u2013 Primaria  Ocna de Fier COMUNA OCNA DE FIER Jude\u021bul Cara\u0219-Severin Comuna Ocna de Fier Evenimente ...gricol Resurse umane Stare civil\u0103 Taxe \u0219i impozite Urbanism Copyright\u00a9 2026 Primaria Ocna de Fier Web Design: INFOGHID&amp;#x27;.lower\n\ntest_ocna_de_fier.py:240: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/lacase-de-cult-LACASE DE CULT]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/lacase-de-cult-LACASE DE CULT]&#34;, &#34;duration&#34;: &#34;197 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/lacase-de-cult-LACASE DE CULT]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;197 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/obiceiuri-si-traditii-OBICEIURI SI TRADITII]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/obiceiuri-si-traditii-OBICEIURI SI TRADITII]&#34;, &#34;duration&#34;: &#34;196 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/obiceiuri-si-traditii-OBICEIURI SI TRADITII]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;196 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/evenimente-locale-EVENIMENTE LOCALE]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/evenimente-locale-EVENIMENTE LOCALE]&#34;, &#34;duration&#34;: &#34;203 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/evenimente-locale-EVENIMENTE LOCALE]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;203 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/contact-Contact]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/contact-Contact]&#34;, &#34;duration&#34;: &#34;188 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_pagini_cu_titluri_asteptate[/contact-Contact]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;188 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_toate_linkurile_interne_din_homepage_functioneaza&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_toate_linkurile_interne_din_homepage_functioneaza&#34;, &#34;duration&#34;: &#34;00:00:10&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_toate_linkurile_interne_din_homepage_functioneaza&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:10&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_linkurile_externe_importante_nu_sunt_goale&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_linkurile_externe_importante_nu_sunt_goale&#34;, &#34;duration&#34;: &#34;149 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_linkurile_externe_importante_nu_sunt_goale&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;149 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_imaginile_de_pe_homepage_au_src_valid_si_alt_recomandat&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_imaginile_de_pe_homepage_au_src_valid_si_alt_recomandat&#34;, &#34;duration&#34;: &#34;147 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_imaginile_de_pe_homepage_au_src_valid_si_alt_recomandat&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;147 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_resursele_statice_din_homepage_se_incarca&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_resursele_statice_din_homepage_se_incarca&#34;, &#34;duration&#34;: &#34;00:00:23&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_resursele_statice_din_homepage_se_incarca&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:23&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;\n\n    def test_resursele_statice_din_homepage_se_incarca(session: requests.Session) -&amp;gt; None:\n        response = get_page(session, &amp;quot;/&amp;quot;)\n        soup = parse_html(response)\n        assets = extract_assets(soup, response.url)\n        assert assets, &amp;quot;Nu am gasit resurse statice pe homepage&amp;quot;\n    \n        broken: list[str] = []\n        for asset in assets[:40]:  # limita ca testul sa nu fie prea lent\n            try:\n                r = session.get(asset, timeout=TIMEOUT, allow_redirects=True)\n                if r.status_code &amp;gt;= 400:\n                    broken.append(f&amp;quot;{asset} -&amp;gt; {r.status_code}&amp;quot;)\n            except requests.RequestException as exc:\n                broken.append(f&amp;quot;{asset} -&amp;gt; {exc}&amp;quot;)\n&amp;gt;       assert not broken, &amp;quot;Resurse statice nefunctionale:\\n&amp;quot; + &amp;quot;\\n&amp;quot;.join(broken)\nE       AssertionError: Resurse statice nefunctionale:\nE         https://cdn.elementor.com -&amp;gt; 522\nE         https://cdn.elementor.com/a11y/widget.js?api_key=ea11y-8459a592-1fa6-49df-a592-65245b40ffd3&amp;amp;ver=4.0.3 -&amp;gt; 400\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/android-icon-192x192.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/apple-icon-114x114.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/apple-icon-120x120.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/apple-icon-144x144.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/apple-icon-152x152.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/apple-icon-180x180.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/apple-icon-57x57.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/apple-icon-60x60.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/apple-icon-72x72.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/apple-icon-76x76.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/favicon-96x96.png -&amp;gt; 404\nE         https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json -&amp;gt; 404\nE       assert not [&amp;#x27;https://cdn.elementor.com -&amp;gt; 522&amp;#x27;, &amp;#x27;https://cdn.elementor.com/a11y/widget.js?api_key=ea11y-8459a592-1fa6-49df-a592-6...404&amp;#x27;, &amp;#x27;https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/apple-icon-144x144.png -&amp;gt; 404&amp;#x27;, ...]\n\ntest_ocna_de_fier.py:304: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Acasa-/]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Acasa-/]&#34;, &#34;duration&#34;: &#34;136 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Acasa-/]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;136 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Istoric-/istoric]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Istoric-/istoric]&#34;, &#34;duration&#34;: &#34;196 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Istoric-/istoric]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;196 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Cultura-/cultura]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Cultura-/cultura]&#34;, &#34;duration&#34;: &#34;196 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Cultura-/cultura]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;196 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Geografie-/geografie]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Geografie-/geografie]&#34;, &#34;duration&#34;: &#34;115 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Geografie-/geografie]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;115 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Obiective turistice-/obiective-turistice]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Obiective turistice-/obiective-turistice]&#34;, &#34;duration&#34;: &#34;117 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Obiective turistice-/obiective-turistice]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;117 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Lacase de cult-/lacase-de-cult]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Lacase de cult-/lacase-de-cult]&#34;, &#34;duration&#34;: &#34;192 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Lacase de cult-/lacase-de-cult]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;192 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Obiceiuri si traditii-/obiceiuri-si-traditii]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Obiceiuri si traditii-/obiceiuri-si-traditii]&#34;, &#34;duration&#34;: &#34;189 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Obiceiuri si traditii-/obiceiuri-si-traditii]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;189 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&#34;, &#34;duration&#34;: &#34;190 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;190 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Evenimente locale-/evenimente-locale]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Evenimente locale-/evenimente-locale]&#34;, &#34;duration&#34;: &#34;186 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Evenimente locale-/evenimente-locale]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;186 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Foto-/foto]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Foto-/foto]&#34;, &#34;duration&#34;: &#34;110 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Foto-/foto]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;110 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Administratie locala-/administratie-locala]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Administratie locala-/administratie-locala]&#34;, &#34;duration&#34;: &#34;111 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Administratie locala-/administratie-locala]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;111 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Contact-/contact]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Contact-/contact]&#34;, &#34;duration&#34;: &#34;195 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Contact-/contact]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;195 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Monitorul Oficial Local-/monitorul-oficial-local]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Monitorul Oficial Local-/monitorul-oficial-local]&#34;, &#34;duration&#34;: &#34;205 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_title_exista_si_are_lungime_rezonabila[Monitorul Oficial Local-/monitorul-oficial-local]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;205 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Acasa-/]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Acasa-/]&#34;, &#34;duration&#34;: &#34;140 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Acasa-/]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;140 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Istoric-/istoric]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Istoric-/istoric]&#34;, &#34;duration&#34;: &#34;191 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Istoric-/istoric]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;191 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Cultura-/cultura]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Cultura-/cultura]&#34;, &#34;duration&#34;: &#34;195 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Cultura-/cultura]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;195 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Geografie-/geografie]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Geografie-/geografie]&#34;, &#34;duration&#34;: &#34;114 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Geografie-/geografie]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;114 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Obiective turistice-/obiective-turistice]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Obiective turistice-/obiective-turistice]&#34;, &#34;duration&#34;: &#34;118 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Obiective turistice-/obiective-turistice]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;118 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Lacase de cult-/lacase-de-cult]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Lacase de cult-/lacase-de-cult]&#34;, &#34;duration&#34;: &#34;235 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Lacase de cult-/lacase-de-cult]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;235 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Obiceiuri si traditii-/obiceiuri-si-traditii]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Obiceiuri si traditii-/obiceiuri-si-traditii]&#34;, &#34;duration&#34;: &#34;199 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Obiceiuri si traditii-/obiceiuri-si-traditii]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;199 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&#34;, &#34;duration&#34;: &#34;201 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Ocupatii si mestesuguri-/ocupatii-si-mestesuguri]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;201 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Evenimente locale-/evenimente-locale]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Evenimente locale-/evenimente-locale]&#34;, &#34;duration&#34;: &#34;191 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Evenimente locale-/evenimente-locale]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;191 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Foto-/foto]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Foto-/foto]&#34;, &#34;duration&#34;: &#34;113 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Foto-/foto]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;113 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Administratie locala-/administratie-locala]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Administratie locala-/administratie-locala]&#34;, &#34;duration&#34;: &#34;114 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Administratie locala-/administratie-locala]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;114 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Contact-/contact]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Contact-/contact]&#34;, &#34;duration&#34;: &#34;196 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Contact-/contact]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;196 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Monitorul Oficial Local-/monitorul-oficial-local]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Monitorul Oficial Local-/monitorul-oficial-local]&#34;, &#34;duration&#34;: &#34;189 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_seo_are_cel_putin_un_heading[Monitorul Oficial Local-/monitorul-oficial-local]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;189 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_meta_description_exista_pe_homepage&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_meta_description_exista_pe_homepage&#34;, &#34;duration&#34;: &#34;149 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_meta_description_exista_pe_homepage&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;149 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;session = &amp;lt;requests.sessions.Session object at 0x000001A8052B1400&amp;gt;\n\n    def test_meta_description_exista_pe_homepage(session: requests.Session) -&amp;gt; None:\n        response = get_page(session, &amp;quot;/&amp;quot;)\n        soup = parse_html(response)\n        description = soup.find(&amp;quot;meta&amp;quot;, attrs={&amp;quot;name&amp;quot;: re.compile(&amp;quot;description&amp;quot;, re.I)})\n&amp;gt;       assert description is not None, &amp;quot;Homepage-ul nu are meta description&amp;quot;\nE       AssertionError: Homepage-ul nu are meta description\nE       assert None is not None\n\ntest_ocna_de_fier.py:329: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_nu_exista_erori_php_wordpress_vizibile&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_nu_exista_erori_php_wordpress_vizibile&#34;, &#34;duration&#34;: &#34;138 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_nu_exista_erori_php_wordpress_vizibile&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;138 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_https_este_folosit_si_certificatul_acceptat&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_https_este_folosit_si_certificatul_acceptat&#34;, &#34;duration&#34;: &#34;120 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_https_este_folosit_si_certificatul_acceptat&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;120 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_http_redirecteaza_sau_raspunde_corect&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_http_redirecteaza_sau_raspunde_corect&#34;, &#34;duration&#34;: &#34;150 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_http_redirecteaza_sau_raspunde_corect&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;150 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_cautarea_exista_sau_nu_da_eroare&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_cautarea_exista_sau_nu_da_eroare&#34;, &#34;duration&#34;: &#34;275 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_cautarea_exista_sau_nu_da_eroare&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;275 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_robots_txt_nu_da_eroare_server&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_robots_txt_nu_da_eroare_server&#34;, &#34;duration&#34;: &#34;16 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_robots_txt_nu_da_eroare_server&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;16 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_sitemap_xml_daca_exista_este_valid&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_sitemap_xml_daca_exista_este_valid&#34;, &#34;duration&#34;: &#34;142 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_sitemap_xml_daca_exista_este_valid&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;142 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_selenium_homepage_se_incarca_in_browser&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_selenium_homepage_se_incarca_in_browser&#34;, &#34;duration&#34;: &#34;00:00:04&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_selenium_homepage_se_incarca_in_browser&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:04&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_selenium_navigare_contact&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_selenium_navigare_contact&#34;, &#34;duration&#34;: &#34;821 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_selenium_navigare_contact&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;821 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;test_ocna_de_fier.py::test_selenium_responsive_fara_scroll_orizontal_major[390-844-mobil]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_selenium_responsive_fara_scroll_orizontal_major[390-844-mobil]&#34;, &#34;duration&#34;: &#34;00:00:02&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_selenium_responsive_fara_scroll_orizontal_major[390-844-mobil]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:02&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;chrome_driver = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;51f03bcb34b5e15320e635e4121fc7fe&amp;quot;)&amp;gt;, width = 390, height = 844, label = &amp;#x27;mobil&amp;#x27;\n\n    @pytest.mark.parametrize(\n        &amp;quot;width,height,label&amp;quot;,\n        [\n            (390, 844, &amp;quot;mobil&amp;quot;),\n            (768, 1024, &amp;quot;tableta&amp;quot;),\n            (1366, 900, &amp;quot;desktop&amp;quot;),\n        ],\n    )\n    def test_selenium_responsive_fara_scroll_orizontal_major(chrome_driver, width: int, height: int, label: str) -&amp;gt; None:\n        chrome_driver.set_window_size(width, height)\n        chrome_driver.get(BASE_URL)\n        time.sleep(1)\n        scroll_width = chrome_driver.execute_script(&amp;quot;return document.documentElement.scrollWidth&amp;quot;)\n        client_width = chrome_driver.execute_script(&amp;quot;return document.documentElement.clientWidth&amp;quot;)\n&amp;gt;       assert scroll_width &amp;lt;= client_width + 20, f&amp;quot;Layout-ul {label} are scroll orizontal major&amp;quot;\nE       AssertionError: Layout-ul mobil are scroll orizontal major\nE       assert 558 &amp;lt;= (474 + 20)\n\ntest_ocna_de_fier.py:452: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_selenium_responsive_fara_scroll_orizontal_major[768-1024-tableta]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_selenium_responsive_fara_scroll_orizontal_major[768-1024-tableta]&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_selenium_responsive_fara_scroll_orizontal_major[768-1024-tableta]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;chrome_driver = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;51f03bcb34b5e15320e635e4121fc7fe&amp;quot;)&amp;gt;, width = 768, height = 1024, label = &amp;#x27;tableta&amp;#x27;\n\n    @pytest.mark.parametrize(\n        &amp;quot;width,height,label&amp;quot;,\n        [\n            (390, 844, &amp;quot;mobil&amp;quot;),\n            (768, 1024, &amp;quot;tableta&amp;quot;),\n            (1366, 900, &amp;quot;desktop&amp;quot;),\n        ],\n    )\n    def test_selenium_responsive_fara_scroll_orizontal_major(chrome_driver, width: int, height: int, label: str) -&amp;gt; None:\n        chrome_driver.set_window_size(width, height)\n        chrome_driver.get(BASE_URL)\n        time.sleep(1)\n        scroll_width = chrome_driver.execute_script(&amp;quot;return document.documentElement.scrollWidth&amp;quot;)\n        client_width = chrome_driver.execute_script(&amp;quot;return document.documentElement.clientWidth&amp;quot;)\n&amp;gt;       assert scroll_width &amp;lt;= client_width + 20, f&amp;quot;Layout-ul {label} are scroll orizontal major&amp;quot;\nE       AssertionError: Layout-ul tableta are scroll orizontal major\nE       assert 826 &amp;lt;= (742 + 20)\n\ntest_ocna_de_fier.py:452: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_selenium_responsive_fara_scroll_orizontal_major[1366-900-desktop]&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_selenium_responsive_fara_scroll_orizontal_major[1366-900-desktop]&#34;, &#34;duration&#34;: &#34;00:00:01&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_selenium_responsive_fara_scroll_orizontal_major[1366-900-desktop]&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:01&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;chrome_driver = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;51f03bcb34b5e15320e635e4121fc7fe&amp;quot;)&amp;gt;, width = 1366, height = 900, label = &amp;#x27;desktop&amp;#x27;\n\n    @pytest.mark.parametrize(\n        &amp;quot;width,height,label&amp;quot;,\n        [\n            (390, 844, &amp;quot;mobil&amp;quot;),\n            (768, 1024, &amp;quot;tableta&amp;quot;),\n            (1366, 900, &amp;quot;desktop&amp;quot;),\n        ],\n    )\n    def test_selenium_responsive_fara_scroll_orizontal_major(chrome_driver, width: int, height: int, label: str) -&amp;gt; None:\n        chrome_driver.set_window_size(width, height)\n        chrome_driver.get(BASE_URL)\n        time.sleep(1)\n        scroll_width = chrome_driver.execute_script(&amp;quot;return document.documentElement.scrollWidth&amp;quot;)\n        client_width = chrome_driver.execute_script(&amp;quot;return document.documentElement.clientWidth&amp;quot;)\n&amp;gt;       assert scroll_width &amp;lt;= client_width + 20, f&amp;quot;Layout-ul {label} are scroll orizontal major&amp;quot;\nE       AssertionError: Layout-ul desktop are scroll orizontal major\nE       assert 1450 &amp;lt;= (1340 + 20)\n\ntest_ocna_de_fier.py:452: AssertionError\n&#34;}], &#34;test_ocna_de_fier.py::test_selenium_contact_nu_are_erori_javascript_critice&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;test_ocna_de_fier.py::test_selenium_contact_nu_are_erori_javascript_critice&#34;, &#34;duration&#34;: &#34;00:00:03&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;test_ocna_de_fier.py::test_selenium_contact_nu_are_erori_javascript_critice&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:03&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;chrome_driver = &amp;lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&amp;quot;51f03bcb34b5e15320e635e4121fc7fe&amp;quot;)&amp;gt;\n\n    def test_selenium_contact_nu_are_erori_javascript_critice(chrome_driver) -&amp;gt; None:\n        chrome_driver.get(make_url(&amp;quot;/contact&amp;quot;))\n        logs = []\n        try:\n            logs = chrome_driver.get_log(&amp;quot;browser&amp;quot;)\n        except Exception:\n            pytest.skip(&amp;quot;Browser-ul nu permite citirea logurilor JS in acest mediu&amp;quot;)\n    \n        severe_errors = [entry for entry in logs if entry.get(&amp;quot;level&amp;quot;) == &amp;quot;SEVERE&amp;quot;]\n&amp;gt;       assert not severe_errors, f&amp;quot;Erori JavaScript severe pe contact: {severe_errors}&amp;quot;\nE       AssertionError: Erori JavaScript severe pe contact: [{&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json - Failed to load resource: the server responded with a status of 404 ()&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;network&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591120550}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/ 771 Manifest fetch from https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json failed, code 404&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;other&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591120550}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json - Failed to load resource: the server responded with a status of 404 ()&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;network&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591120942}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/ - Manifest fetch from https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json failed, code 404&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;other&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591120942}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json - Failed to load resource: the server responded with a status of 404 ()&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;network&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591121318}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/ - Manifest fetch from https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json failed, code 404&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;other&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591121318}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json - Failed to load resource: the server responded with a status of 404 ()&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;network&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591121759}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/contact/ - Manifest fetch from https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json failed, code 404&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;other&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591121759}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json - Failed to load resource: the server responded with a status of 404 ()&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;network&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591123163}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/ - Manifest fetch from https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json failed, code 404&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;other&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591123163}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json - Failed to load resource: the server responded with a status of 404 ()&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;network&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591124437}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/ - Manifest fetch from https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json failed, code 404&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;other&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591124437}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json - Failed to load resource: the server responded with a status of 404 ()&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;network&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591125646}, {&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/ - Manifest fetch from https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest.json failed, code 404&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;other&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591125646}]\nE       assert not [{&amp;#x27;level&amp;#x27;: &amp;#x27;SEVERE&amp;#x27;, &amp;#x27;message&amp;#x27;: &amp;#x27;https://www.ocnadefier.ro/wp-content/themes/halltemplate/assets/img/favicon/manifest....s/halltemplate/assets/img/favicon/manifest.json failed, code 404&amp;#x27;, &amp;#x27;source&amp;#x27;: &amp;#x27;other&amp;#x27;, &amp;#x27;timestamp&amp;#x27;: 1781591121318}, ...]\n\ntest_ocna_de_fier.py:464: AssertionError\n&#34;}]}, &#34;renderCollapsed&#34;: [&#34;passed&#34;], &#34;initialSort&#34;: &#34;result&#34;, &#34;title&#34;: &#34;raport_ocna_de_fier.html&#34;}"></div>
+    <script>
+      (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const { getCollapsedCategory, setCollapsedIds } = require('./storage.js')
+
+class DataManager {
+    setManager(data) {
+        const collapsedCategories = [...getCollapsedCategory(data.renderCollapsed)]
+        const collapsedIds = []
+        const tests = Object.values(data.tests).flat().map((test, index) => {
+            const collapsed = collapsedCategories.includes(test.result.toLowerCase())
+            const id = `test_${index}`
+            if (collapsed) {
+                collapsedIds.push(id)
+            }
+            return {
+                ...test,
+                id,
+                collapsed,
+            }
+        })
+        const dataBlob = { ...data, tests }
+        this.data = { ...dataBlob }
+        this.renderData = { ...dataBlob }
+        setCollapsedIds(collapsedIds)
+    }
+
+    get allData() {
+        return { ...this.data }
+    }
+
+    resetRender() {
+        this.renderData = { ...this.data }
+    }
+
+    setRender(data) {
+        this.renderData.tests = [...data]
+    }
+
+    toggleCollapsedItem(id) {
+        this.renderData.tests = this.renderData.tests.map((test) =>
+            test.id === id ? { ...test, collapsed: !test.collapsed } : test,
+        )
+    }
+
+    set allCollapsed(collapsed) {
+        this.renderData = { ...this.renderData, tests: [...this.renderData.tests.map((test) => (
+            { ...test, collapsed }
+        ))] }
+    }
+
+    get testSubset() {
+        return [...this.renderData.tests]
+    }
+
+    get environment() {
+        return this.renderData.environment
+    }
+
+    get initialSort() {
+        return this.data.initialSort
+    }
+}
+
+module.exports = {
+    manager: new DataManager(),
+}
+
+},{"./storage.js":8}],2:[function(require,module,exports){
+const mediaViewer = require('./mediaviewer.js')
+const templateEnvRow = document.getElementById('template_environment_row')
+const templateResult = document.getElementById('template_results-table__tbody')
+
+function htmlToElements(html) {
+    const temp = document.createElement('template')
+    temp.innerHTML = html
+    return temp.content.childNodes
+}
+
+const find = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return elem.querySelector(selector)
+}
+
+const findAll = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return [...elem.querySelectorAll(selector)]
+}
+
+const dom = {
+    getStaticRow: (key, value) => {
+        const envRow = templateEnvRow.content.cloneNode(true)
+        const isObj = typeof value === 'object' && value !== null
+        const values = isObj ? Object.keys(value).map((k) => `${k}: ${value[k]}`) : null
+
+        const valuesElement = htmlToElements(
+            values ? `<ul>${values.map((val) => `<li>${val}</li>`).join('')}<ul>` : `<div>${value}</div>`)[0]
+        const td = findAll('td', envRow)
+        td[0].textContent = key
+        td[1].appendChild(valuesElement)
+
+        return envRow
+    },
+    getResultTBody: ({ testId, id, log, extras, resultsTableRow, tableHtml, result, collapsed }) => {
+        const resultBody = templateResult.content.cloneNode(true)
+        resultBody.querySelector('tbody').classList.add(result.toLowerCase())
+        resultBody.querySelector('tbody').id = testId
+        resultBody.querySelector('.collapsible').dataset.id = id
+
+        resultsTableRow.forEach((html) => {
+            const t = document.createElement('template')
+            t.innerHTML = html
+            resultBody.querySelector('.collapsible').appendChild(t.content)
+        })
+
+        if (log) {
+            // Wrap lines starting with "E" with span.error to color those lines red
+            const wrappedLog = log.replace(/^E.*$/gm, (match) => `<span class="error">${match}</span>`)
+            resultBody.querySelector('.log').innerHTML = wrappedLog
+        } else {
+            resultBody.querySelector('.log').remove()
+        }
+
+        if (collapsed) {
+            resultBody.querySelector('.collapsible > .col-result')?.classList.add('collapsed')
+            resultBody.querySelector('.extras-row').classList.add('hidden')
+        } else {
+            resultBody.querySelector('.collapsible > .col-result')?.classList.remove('collapsed')
+        }
+
+        const media = []
+        extras?.forEach(({ name, format_type, content }) => {
+            if (['image', 'video'].includes(format_type)) {
+                media.push({ path: content, name, format_type })
+            }
+
+            if (format_type === 'html') {
+                resultBody.querySelector('.extraHTML').insertAdjacentHTML('beforeend', `<div>${content}</div>`)
+            }
+        })
+        mediaViewer.setup(resultBody, media)
+
+        // Add custom html from the pytest_html_results_table_html hook
+        tableHtml?.forEach((item) => {
+            resultBody.querySelector('td[class="extra"]').insertAdjacentHTML('beforeend', item)
+        })
+
+        return resultBody
+    },
+}
+
+module.exports = {
+    dom,
+    htmlToElements,
+    find,
+    findAll,
+}
+
+},{"./mediaviewer.js":6}],3:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const storageModule = require('./storage.js')
+
+const getFilteredSubSet = (filter) =>
+    manager.allData.tests.filter(({ result }) => filter.includes(result.toLowerCase()))
+
+const doInitFilter = () => {
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+}
+
+const doFilter = (type, show) => {
+    if (show) {
+        storageModule.showCategory(type)
+    } else {
+        storageModule.hideCategory(type)
+    }
+
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+
+    const sortColumn = storageModule.getSort()
+    doSort(sortColumn, true)
+}
+
+module.exports = {
+    doFilter,
+    doInitFilter,
+}
+
+},{"./datamanager.js":1,"./sort.js":7,"./storage.js":8}],4:[function(require,module,exports){
+const { redraw, bindEvents, renderStatic } = require('./main.js')
+const { doInitFilter } = require('./filter.js')
+const { doInitSort } = require('./sort.js')
+const { manager } = require('./datamanager.js')
+const data = JSON.parse(document.getElementById('data-container').dataset.jsonblob)
+
+function init() {
+    manager.setManager(data)
+    doInitFilter()
+    doInitSort()
+    renderStatic()
+    redraw()
+    bindEvents()
+}
+
+init()
+
+},{"./datamanager.js":1,"./filter.js":3,"./main.js":5,"./sort.js":7}],5:[function(require,module,exports){
+const { dom, find, findAll } = require('./dom.js')
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const { doFilter } = require('./filter.js')
+const {
+    getVisible,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    getSortDirection,
+    possibleFilters,
+} = require('./storage.js')
+
+const removeChildren = (node) => {
+    while (node.firstChild) {
+        node.removeChild(node.firstChild)
+    }
+}
+
+const renderStatic = () => {
+    const renderEnvironmentTable = () => {
+        const environment = manager.environment
+        const rows = Object.keys(environment).map((key) => dom.getStaticRow(key, environment[key]))
+        const table = document.getElementById('environment')
+        removeChildren(table)
+        rows.forEach((row) => table.appendChild(row))
+    }
+    renderEnvironmentTable()
+}
+
+const addItemToggleListener = (elem) => {
+    elem.addEventListener('click', ({ target }) => {
+        const id = target.parentElement.dataset.id
+        manager.toggleCollapsedItem(id)
+
+        const collapsedIds = getCollapsedIds()
+        if (collapsedIds.includes(id)) {
+            const updated = collapsedIds.filter((item) => item !== id)
+            setCollapsedIds(updated)
+        } else {
+            collapsedIds.push(id)
+            setCollapsedIds(collapsedIds)
+        }
+        redraw()
+    })
+}
+
+const renderContent = (tests) => {
+    const sortAttr = getSort(manager.initialSort)
+    const sortAsc = JSON.parse(getSortDirection())
+    const rows = tests.map(dom.getResultTBody)
+    const table = document.getElementById('results-table')
+    const tableHeader = document.getElementById('results-table-head')
+
+    const newTable = document.createElement('table')
+    newTable.id = 'results-table'
+
+    // remove all sorting classes and set the relevant
+    findAll('.sortable', tableHeader).forEach((elem) => elem.classList.remove('asc', 'desc'))
+    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
+    newTable.appendChild(tableHeader)
+
+    if (!rows.length) {
+        const emptyTable = document.getElementById('template_results-table__body--empty').content.cloneNode(true)
+        newTable.appendChild(emptyTable)
+    } else {
+        rows.forEach((row) => {
+            if (!!row) {
+                findAll('.collapsible td:not(.col-links', row).forEach(addItemToggleListener)
+                find('.logexpander', row).addEventListener('click',
+                    (evt) => evt.target.parentNode.classList.toggle('expanded'),
+                )
+                newTable.appendChild(row)
+            }
+        })
+    }
+
+    table.replaceWith(newTable)
+}
+
+const renderDerived = () => {
+    const currentFilter = getVisible()
+    possibleFilters.forEach((result) => {
+        const input = document.querySelector(`input[data-test-result="${result}"]`)
+        input.checked = currentFilter.includes(result)
+    })
+}
+
+const bindEvents = () => {
+    const filterColumn = (evt) => {
+        const { target: element } = evt
+        const { testResult } = element.dataset
+
+        doFilter(testResult, element.checked)
+        const collapsedIds = getCollapsedIds()
+        const updated = manager.renderData.tests.map((test) => {
+            return {
+                ...test,
+                collapsed: collapsedIds.includes(test.id),
+            }
+        })
+        manager.setRender(updated)
+        redraw()
+    }
+
+    const header = document.getElementById('environment-header')
+    header.addEventListener('click', () => {
+        const table = document.getElementById('environment')
+        table.classList.toggle('hidden')
+        header.classList.toggle('collapsed')
+    })
+
+    findAll('input[name="filter_checkbox"]').forEach((elem) => {
+        elem.addEventListener('click', filterColumn)
+    })
+
+    findAll('.sortable').forEach((elem) => {
+        elem.addEventListener('click', (evt) => {
+            const { target: element } = evt
+            const { columnType } = element.dataset
+            doSort(columnType)
+            redraw()
+        })
+    })
+
+    document.getElementById('show_all_details').addEventListener('click', () => {
+        manager.allCollapsed = false
+        setCollapsedIds([])
+        redraw()
+    })
+    document.getElementById('hide_all_details').addEventListener('click', () => {
+        manager.allCollapsed = true
+        const allIds = manager.renderData.tests.map((test) => test.id)
+        setCollapsedIds(allIds)
+        redraw()
+    })
+}
+
+const redraw = () => {
+    const { testSubset } = manager
+
+    renderContent(testSubset)
+    renderDerived()
+}
+
+module.exports = {
+    redraw,
+    bindEvents,
+    renderStatic,
+}
+
+},{"./datamanager.js":1,"./dom.js":2,"./filter.js":3,"./sort.js":7,"./storage.js":8}],6:[function(require,module,exports){
+class MediaViewer {
+    constructor(assets) {
+        this.assets = assets
+        this.index = 0
+    }
+
+    nextActive() {
+        this.index = this.index === this.assets.length - 1 ? 0 : this.index + 1
+        return [this.activeFile, this.index]
+    }
+
+    prevActive() {
+        this.index = this.index === 0 ? this.assets.length - 1 : this.index -1
+        return [this.activeFile, this.index]
+    }
+
+    get currentIndex() {
+        return this.index
+    }
+
+    get activeFile() {
+        return this.assets[this.index]
+    }
+}
+
+
+const setup = (resultBody, assets) => {
+    if (!assets.length) {
+        resultBody.querySelector('.media').classList.add('hidden')
+        return
+    }
+
+    const mediaViewer = new MediaViewer(assets)
+    const container = resultBody.querySelector('.media-container')
+    const leftArrow = resultBody.querySelector('.media-container__nav--left')
+    const rightArrow = resultBody.querySelector('.media-container__nav--right')
+    const mediaName = resultBody.querySelector('.media__name')
+    const counter = resultBody.querySelector('.media__counter')
+    const imageEl = resultBody.querySelector('img')
+    const sourceEl = resultBody.querySelector('source')
+    const videoEl = resultBody.querySelector('video')
+
+    const setImg = (media, index) => {
+        if (media?.format_type === 'image') {
+            imageEl.src = media.path
+
+            imageEl.classList.remove('hidden')
+            videoEl.classList.add('hidden')
+        } else if (media?.format_type === 'video') {
+            sourceEl.src = media.path
+
+            videoEl.classList.remove('hidden')
+            imageEl.classList.add('hidden')
+        }
+
+        mediaName.innerText = media?.name
+        counter.innerText = `${index + 1} / ${assets.length}`
+    }
+    setImg(mediaViewer.activeFile, mediaViewer.currentIndex)
+
+    const moveLeft = () => {
+        const [media, index] = mediaViewer.prevActive()
+        setImg(media, index)
+    }
+    const doRight = () => {
+        const [media, index] = mediaViewer.nextActive()
+        setImg(media, index)
+    }
+    const openImg = () => {
+        window.open(mediaViewer.activeFile.path, '_blank')
+    }
+    if (assets.length === 1) {
+        container.classList.add('media-container--fullscreen')
+    } else {
+        leftArrow.addEventListener('click', moveLeft)
+        rightArrow.addEventListener('click', doRight)
+    }
+    imageEl.addEventListener('click', openImg)
+}
+
+module.exports = {
+    setup,
+}
+
+},{}],7:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const storageModule = require('./storage.js')
+
+const genericSort = (list, key, ascending, customOrder) => {
+    let sorted
+    if (customOrder) {
+        sorted = list.sort((a, b) => {
+            const aValue = a.result.toLowerCase()
+            const bValue = b.result.toLowerCase()
+
+            const aIndex = customOrder.findIndex((item) => item.toLowerCase() === aValue)
+            const bIndex = customOrder.findIndex((item) => item.toLowerCase() === bValue)
+
+            // Compare the indices to determine the sort order
+            return aIndex - bIndex
+        })
+    } else {
+        sorted = list.sort((a, b) => a[key] === b[key] ? 0 : a[key] > b[key] ? 1 : -1)
+    }
+
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const durationSort = (list, ascending) => {
+    const parseDuration = (duration) => {
+        if (duration.includes(':')) {
+            // If it's in the format "HH:mm:ss"
+            const [hours, minutes, seconds] = duration.split(':').map(Number)
+            return (hours * 3600 + minutes * 60 + seconds) * 1000
+        } else {
+            // If it's in the format "nnn ms"
+            return parseInt(duration)
+        }
+    }
+    const sorted = list.sort((a, b) => parseDuration(a['duration']) - parseDuration(b['duration']))
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const doInitSort = () => {
+    const type = storageModule.getSort(manager.initialSort)
+    const ascending = storageModule.getSortDirection()
+    const list = manager.testSubset
+    const initialOrder = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed', 'Skipped', 'Passed']
+
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    if (type?.toLowerCase() === 'original') {
+        manager.setRender(list)
+    } else {
+        let sortedList
+        switch (type) {
+        case 'duration':
+            sortedList = durationSort(list, ascending)
+            break
+        case 'result':
+            sortedList = genericSort(list, type, ascending, initialOrder)
+            break
+        default:
+            sortedList = genericSort(list, type, ascending)
+            break
+        }
+        manager.setRender(sortedList)
+    }
+}
+
+const doSort = (type, skipDirection) => {
+    const newSortType = storageModule.getSort(manager.initialSort) !== type
+    const currentAsc = storageModule.getSortDirection()
+    let ascending
+    if (skipDirection) {
+        ascending = currentAsc
+    } else {
+        ascending = newSortType ? false : !currentAsc
+    }
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    const list = manager.testSubset
+    const sortedList = type === 'duration' ? durationSort(list, ascending) : genericSort(list, type, ascending)
+    manager.setRender(sortedList)
+}
+
+module.exports = {
+    doInitSort,
+    doSort,
+}
+
+},{"./datamanager.js":1,"./storage.js":8}],8:[function(require,module,exports){
+const possibleFilters = [
+    'passed',
+    'skipped',
+    'failed',
+    'error',
+    'xfailed',
+    'xpassed',
+    'rerun',
+]
+
+const getVisible = () => {
+    const url = new URL(window.location.href)
+    const settings = new URLSearchParams(url.search).get('visible')
+    const lower = (item) => {
+        const lowerItem = item.toLowerCase()
+        if (possibleFilters.includes(lowerItem)) {
+            return lowerItem
+        }
+        return null
+    }
+    return settings === null ?
+        possibleFilters :
+        [...new Set(settings?.split(',').map(lower).filter((item) => item))]
+}
+
+const hideCategory = (categoryToHide) => {
+    const url = new URL(window.location.href)
+    const visibleParams = new URLSearchParams(url.search).get('visible')
+    const currentVisible = visibleParams ? visibleParams.split(',') : [...possibleFilters]
+    const settings = [...new Set(currentVisible)].filter((f) => f !== categoryToHide).join(',')
+
+    url.searchParams.set('visible', settings)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const showCategory = (categoryToShow) => {
+    if (typeof window === 'undefined') {
+        return
+    }
+    const url = new URL(window.location.href)
+    const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',').filter(Boolean) ||
+        [...possibleFilters]
+    const settings = [...new Set([categoryToShow, ...currentVisible])]
+    const noFilter = possibleFilters.length === settings.length || !settings.length
+
+    noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getSort = (initialSort) => {
+    const url = new URL(window.location.href)
+    let sort = new URLSearchParams(url.search).get('sort')
+    if (!sort) {
+        sort = initialSort || 'result'
+    }
+    return sort
+}
+
+const setSort = (type) => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('sort', type)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getCollapsedCategory = (renderCollapsed) => {
+    let categories
+    if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        const collapsedItems = new URLSearchParams(url.search).get('collapsed')
+        switch (true) {
+        case !renderCollapsed && collapsedItems === null:
+            categories = ['passed']
+            break
+        case collapsedItems?.length === 0 || /^["']{2}$/.test(collapsedItems):
+            categories = []
+            break
+        case /^all$/.test(collapsedItems) || collapsedItems === null && /^all$/.test(renderCollapsed):
+            categories = [...possibleFilters]
+            break
+        default:
+            categories = collapsedItems?.split(',').map((item) => item.toLowerCase()) || renderCollapsed
+            break
+        }
+    } else {
+        categories = []
+    }
+    return categories
+}
+
+const getSortDirection = () => JSON.parse(sessionStorage.getItem('sortAsc')) || false
+const setSortDirection = (ascending) => sessionStorage.setItem('sortAsc', ascending)
+
+const getCollapsedIds = () => JSON.parse(sessionStorage.getItem('collapsedIds')) || []
+const setCollapsedIds = (list) => sessionStorage.setItem('collapsedIds', JSON.stringify(list))
+
+module.exports = {
+    getVisible,
+    hideCategory,
+    showCategory,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    setSort,
+    getSortDirection,
+    setSortDirection,
+    getCollapsedCategory,
+    possibleFilters,
+}
+
+},{}]},{},[4]);
+    </script>
+  </footer>
+  </body>
+</html>
